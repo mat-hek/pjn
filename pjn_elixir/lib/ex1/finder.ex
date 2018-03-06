@@ -5,7 +5,7 @@ defmodule Ex1.Finder do
     prefix_sizes = %{"tys" => 1_000, "mln" => 1_000_000, "mld" => 1_000_000_000}
     prefix = prefix_sizes |> Map.keys |> mk_alt
     unit = ~w(zł złoty złotych) |> mk_alt
-    re = ~r"((?:\d(?:\s|\.)*)+(?:,\s?\d+\s)?)(?:(#{prefix})\.?\s)?#{unit}\b"u
+    re = ~r"((?:\d(?:\s|\.|,)*)+)(?:(#{prefix})\.?\s)?#{unit}\b"u
     re
       |> Regex.scan(text)
       |> Enum.flat_map(fn
@@ -32,10 +32,9 @@ defmodule Ex1.Finder do
   end
   
   def count_szkodas(text) do
-    szkodas = ~w(szkodą szkodę szkodo szkody szkodzie szkodach szkodami szkodom) |> mk_alt
-    ~r"#{szkodas}"
-      |> Regex.scan(text)
-      |> Enum.count
+    szkodas = ~w(szkoda szkodą szkodę szkodo szkody szkodzie szkodach szkodami szkodom szkód) |> mk_alt
+    ~r"\b#{szkodas}\b"iu
+      |> Regex.run(text)
   end
     
 end

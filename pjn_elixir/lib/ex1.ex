@@ -20,10 +20,10 @@ defmodule Ex1 do
   
   def count_szkodas(judgments) do
     judgments
-      |> Flow.map(fn %{"textContent" => content} ->
+      |> Flow.filter(fn %{"textContent" => content} ->
           content |> Finder.count_szkodas
         end)
-      |> Enum.sum
+      |> Enum.count
   end
   
   def count_KC(judgments) do
