@@ -25,6 +25,7 @@ defmodule Pjn.Mixfile do
       {:poison, "~> 3.1"},
       {:expyplot, "~> 1.1.2"},
       {:flow, "~> 0.13"},
+      {:httpoison, "~> 1.0"},
     ]
   end
 end
