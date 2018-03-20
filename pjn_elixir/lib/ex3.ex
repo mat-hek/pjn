@@ -41,6 +41,7 @@ defmodule Ex3 do
     y = fl |> Keyword.values
     alias Expyplot.Plot
     Plot.plot [x, y]
+    Plot.xscale ["log"]
     Plot.yscale ["log"]
     Plot.xlabel "Miejsce slowa na liscie"
     Plot.ylabel "Liczba wystapien"
