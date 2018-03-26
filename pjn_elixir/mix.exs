@@ -23,7 +23,7 @@ defmodule Pjn.Mixfile do
   defp deps do
     [
       {:poison, "~> 3.1"},
-      {:expyplot, "~> 1.1.2"},
+      {:explot, "~> 0.1.0"},
       {:flow, "~> 0.13"},
       {:httpoison, "~> 1.0"},
     ]

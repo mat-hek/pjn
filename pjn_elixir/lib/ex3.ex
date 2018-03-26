@@ -2,7 +2,7 @@ defmodule Ex3 do
   alias Pjn.Helper.Serializer
   alias Ex3.Levenstein
 
-  @dump_path "/Users/mathek/Desktop/shit/agh/pjn/repo/dump/ex3/"
+  def dump_base, do: "/Users/mathek/Desktop/shit/agh/pjn/repo/dump/ex3/"
 
   def mk_freq_list(judgments) do
     judgments
@@ -36,16 +36,16 @@ defmodule Ex3 do
       end)
   end
 
-  def plot_freq_list(fl) do
-    x = 1..length(fl)
-    y = fl |> Keyword.values
-    alias Expyplot.Plot
-    Plot.plot [x, y]
-    Plot.xscale ["log"]
-    Plot.yscale ["log"]
-    Plot.xlabel "Miejsce slowa na liscie"
-    Plot.ylabel "Liczba wystapien"
-    Plot.show
+  def plot_freq_list(_fl) do
+    # x = 1..length(fl)
+    # y = fl |> Keyword.values
+    # alias Expyplot.Plot
+    # Plot.plot [x, y]
+    # Plot.xscale ["log"]
+    # Plot.yscale ["log"]
+    # Plot.xlabel "Miejsce slowa na liscie"
+    # Plot.ylabel "Liczba wystapien"
+    # Plot.show
   end
 
   def read_morfologik do
@@ -80,14 +80,14 @@ defmodule Ex3 do
 
   end
 
-  def store_freq_list(fl, name) do
+  def store_freq_list(fl, name, dump_base \\ dump_base()) do
     fl
       |> Enum.map(&Tuple.to_list/1)
-      |> Serializer.dump_to_file("#{@dump_path}#{name}.json")
+      |> Serializer.dump_to_file("#{dump_base}#{name}.json")
   end
 
-  def read_freq_list(name) do
-    Serializer.read_from_file("#{@dump_path}#{name}.json")
+  def read_freq_list(name, dump_base \\ dump_base()) do
+    Serializer.read_from_file("#{dump_base}#{name}.json")
       |> Enum.map(&List.to_tuple/1)
   end
 end

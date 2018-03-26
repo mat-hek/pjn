@@ -1,7 +1,7 @@
 defmodule Ex1 do
   alias Ex1.Finder
-  alias Expyplot.Plot
-  
+  # alias Expyplot.Plot
+
   def find_money(judgments) do
     judgments
       |> Flow.flat_map(fn %{"textContent" => content} ->
@@ -9,15 +9,15 @@ defmodule Ex1 do
       end)
       |> Enum.to_list
   end
-  
-  def plot_money(money, args \\ []) do
-    Plot.xlabel "Kwoty [zl]"
-    Plot.ylabel "Liczba wystapien"
-    args = [bins: 20] |> Keyword.merge(args)
-    Plot.hist money, args
-    Plot.show
+
+  def plot_money(_money, _args \\ []) do
+    # Plot.xlabel "Kwoty [zl]"
+    # Plot.ylabel "Liczba wystapien"
+    # args = [bins: 20] |> Keyword.merge(args)
+    # Plot.hist money, args
+    # Plot.show
   end
-  
+
   def count_szkodas(judgments) do
     judgments
       |> Flow.filter(fn %{"textContent" => content} ->
@@ -25,7 +25,7 @@ defmodule Ex1 do
         end)
       |> Enum.count
   end
-  
+
   def count_KC(judgments) do
     judgments
       |> Flow.filter(fn %{"referencedRegulations" => refs} ->
@@ -37,5 +37,5 @@ defmodule Ex1 do
         end)
       |> Enum.count
   end
-  
+
 end
