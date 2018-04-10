@@ -8,10 +8,8 @@ defmodule Ex4 do
     bcnt = bg |> count_words
     bg
     |> Enum.map(fn {words, cnt} ->
-        [cnt1, cnt2] = words |> Enum.map(&(fl[&1] - cnt) |> max(0))
-        # if cnt1 < 0 or cnt2 < 0 do
-        #   IO.inspect {words, words |> Enum.map(&fl[&1]), cnt}
-        # end
+        [cnt1, cnt2] = (case words do {w1, w2} -> [w1, w2]; ms -> ms end)
+        |> Enum.map(&(fl[&1] - cnt) |> max(0))
         ncnt = bcnt - cnt
         e = shannon_entropy([cnt, cnt1, cnt2, ncnt])
         e_rsum = shannon_entropy([cnt + cnt1, cnt2 + ncnt])

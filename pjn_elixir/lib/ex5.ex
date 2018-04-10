@@ -24,6 +24,38 @@ defmodule Ex5 do
     |> calc_bigrams()
   end
 
+  def reduce_bigrams(files \\ bigrams_files()) do
+    files
+    |> Flow.from_enumerable(max_demand: 1)
+    |> Flow.map(fn path ->
+        File.read!(path) |> :erlang.binary_to_term
+      end)
+    |> Enum.reduce(& Map.merge &1, &2, fn _k, v1, v2 -> v1+v2 end)
+  end
+
+  def bigrams_files() do
+    path = dump_base() |> Path.join("bigrams")
+    File.ls!(path)
+    |> Enum.map(& path |> Path.join(&1))
+  end
+
+  def unigrams_from_bigrams(bigrams) do
+    bigrams
+    |> Enum.reduce(%{}, fn {{w1, w2}, cnt}, acc ->
+        acc
+        |> Map.update(w1, {cnt, 0}, fn {l, r} -> {l + cnt, r} end)
+        |> Map.update(w2, {0, cnt}, fn {l, r} -> {l, r + cnt} end)
+      end)
+    |> Enum.map(fn {w, {l, r}} -> {w, max(l, r)} end)
+  end
+
+  def filter_noun_adj(bigrams) do
+    bigrams
+    |> Enum.filter(fn {{{_w1, type1}, {_w2, type2}}, _cnt} ->
+        type1 == :subst and type2 in [:adj, :adja, :adjp, :adjc]
+      end)
+  end
+
   defp get_bigrams(content) do
     content = Regex.replace(~r"\<[^\>]*\>", content, " ")
     with {:ok, %{body: data}}
