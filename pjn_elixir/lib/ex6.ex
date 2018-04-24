@@ -83,8 +83,12 @@ defmodule Ex6 do
       end)
     |> Flow.run
 
-    [:flexed, :base_form]
-    |> Enum.flat_map(&cases_paths_by_types/1)
+    [:flexed, :base_form] |> Enum.each(&do_prepare_cases/1)
+  end
+
+  defp do_prepare_cases(flex) do
+    paths_by_types = cases_paths_by_types(flex)
+    paths_by_types
     |> Enum.each(fn {_type, path} ->
       [Binserializer.read_from_file(path)]
       |> List.flatten
@@ -92,11 +96,9 @@ defmodule Ex6 do
       |> (&File.write path, &1).()
     end)
 
-    [:flexed, :base_form]
-    |> Enum.map(& mk_dump_dirs &1, ["train", "test"])
+    mk_dump_dirs(flex, ["train", "test"])
 
-    [:flexed, :base_form]
-    |> Enum.flat_map(&cases_paths_by_types/1)
+    paths_by_types
     |> Enum.group_by(fn {type, _path} -> type end, fn {_type, path} -> path end)
     |> Enum.each(fn {_type, cases} ->
       {train, test} = cases
