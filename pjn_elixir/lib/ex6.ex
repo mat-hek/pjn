@@ -12,25 +12,19 @@ defmodule Ex6 do
     |> Helper.Regex.mk_alt
     |> (case do regex -> ~r"(\b#{regex}\b)" end)
 
+  @train_factor 0.75
+
   def dump_base, do: "/Users/mathek/Desktop/shit/agh/pjn/repo/dump/ex6/"
 
-  def cases_path(case_type), do:
+  def cases_path(case_type, :flexed), do:
     Path.join([dump_base(), "cases", "#{case_type}"])
-  def base_form_cases_path(case_type), do:
+  def cases_path(case_type, :base_form), do:
     Path.join([dump_base(), "cases_bf", "#{case_type}"])
 
   def tag_stored() do
-    @case_types
-    |> Keyword.keys
-    |> Enum.map(&base_form_cases_path/1)
-    |> Enum.each(& &1 |> File.mkdir_p!)
+    mk_dump_dirs(:flexed)
 
-    @case_types
-    |> Keyword.keys
-    |> Enum.flat_map(fn case_type ->
-        pathes = case_type |> cases_path |> Helper.File.ls_paths
-        Stream.repeatedly(fn -> case_type end) |> Enum.zip(pathes)
-       end)
+    cases_paths_by_types(:flexed)
     |> Enum.shuffle
     |> Flow.from_enumerable(max_demand: 1)
     |> Flow.map(fn {case_type, path} ->
@@ -41,7 +35,7 @@ defmodule Ex6 do
     |> Flow.each(fn {id, case_type, content} ->
         with {:ok, data} <- content |> tag_content do
            words = data |> parse_tagged
-           path = case_type |> base_form_cases_path |> Path.join("#{id}")
+           path = case_type |> cases_path(:base_form) |> Path.join("#{id}")
            words |> Binserializer.dump_to_file(path)
         else
           error -> IO.inspect {:error, :tag, id, error}
@@ -52,10 +46,7 @@ defmodule Ex6 do
   end
 
   def categorize(judgments) do
-    @case_types
-    |> Keyword.keys
-    |> Enum.map(&cases_path/1)
-    |> Enum.each(& &1 |> File.mkdir_p!)
+    mk_dump_dirs(:flexed)
 
     judgments
     |> Helper.Flow.flowify(max_demand: 1)
@@ -74,10 +65,65 @@ defmodule Ex6 do
         Enum.zip([case_type, content, [id]])
       end)
     |> Flow.each(fn {case_type, content, id} ->
-        path = case_type |> cases_path |> Path.join("#{id}")
+        path = case_type |> cases_path(:flexed) |> Path.join("#{id}")
         content |> Binserializer.dump_to_file(path)
       end)
     |> Flow.run
+  end
+
+  def prepare_cases() do
+    cases_paths_by_types(:flexed)
+    |> Helper.Flow.flowify(max_demand: 1)
+    |> Flow.each(fn {case_type, path} ->
+        base_form_file = case_type
+        |> cases_path(:base_form) |> Path.join(path |> Path.basename)
+        if(base_form_file |> File.exists? |> Kernel.not) do
+          path |> File.rm!
+        end
+      end)
+    |> Flow.run
+
+    [:flexed, :base_form]
+    |> Enum.flat_map(&cases_paths_by_types/1)
+    |> Enum.each(fn {_type, path} ->
+      [Binserializer.read_from_file(path)]
+      |> List.flatten
+      |> Enum.join(" ")
+      |> (&File.write path, &1).()
+    end)
+
+    [:flexed, :base_form]
+    |> Enum.map(& mk_dump_dirs &1, ["train", "test"])
+
+    [:flexed, :base_form]
+    |> Enum.flat_map(&cases_paths_by_types/1)
+    |> Enum.group_by(fn {type, _path} -> type end, fn {_type, path} -> path end)
+    |> Enum.each(fn {_type, cases} ->
+      {train, test} = cases
+      |> Enum.shuffle
+      |> Enum.split(round(length(cases) * @train_factor))
+      train |> Enum.each(& File.rename(&1, Path.join([&1 |> Path.dirname, "train", &1 |> Path.basename])))
+      test |> Enum.each(& File.rename(&1, Path.join([&1 |> Path.dirname, "test", &1 |> Path.basename])))
+    end)
+  end
+
+  def cases_paths_by_types(flex) do
+    @case_types
+    |> Keyword.keys
+    |> Enum.flat_map(fn case_type ->
+        pathes = case_type |> cases_path(flex) |> Helper.File.ls_paths
+        Stream.repeatedly(fn -> case_type end) |> Enum.zip(pathes)
+       end)
+  end
+
+  defp mk_dump_dirs(flex, subdirs \\ []) do
+    @case_types
+    |> Keyword.keys
+    |> Enum.map(&cases_path &1, flex)
+    |> Enum.each(fn path ->
+      subdirs
+      |> Enum.each(& Path.join(path, &1) |> File.mkdir_p!)
+    end)
   end
 
   def parse_content(judgment_content) do
