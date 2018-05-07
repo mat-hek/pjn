@@ -1,6 +1,8 @@
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
+import itertools
+
 
 from pywnxml.WNQuery import *
 
@@ -25,9 +27,10 @@ def closure(query: WNQuery, wnid, pos, relation):
 
 def wypadek_drogowy_hypernym(query: WNQuery):
     wnid = query.lookUpSense("wypadek drogowy", 1, "n").wnid
-    graph = nx.DiGraph()
     cl = closure(query, wnid, 'n', 'hypernym')
     cl = [(query.getSynset(a, 'n').toString(), query.getSynset(b, 'n').toString()) for (a, b) in cl]
+
+    graph = nx.DiGraph()
     graph.add_edges_from(cl)
     plt.figure(figsize=(15, 10))
     nx.draw_spring(graph, arrows=True, with_labels=True)
@@ -51,3 +54,21 @@ def wypadek_hyponyms(query: WNQuery, row=1):
     return [query.getSynset(h, 'n') for h in hyponyms]
 
 
+def show_relations(query: WNQuery, words):
+    senses = itertools.groupby(words, lambda w: query.lookUpSense(w[:-2], int(w[-2]), w[-1]))
+    senses = [(s, "/".join([w[:-1] for w in ws])) for s, ws in senses]
+
+    rels = {}
+    for s, w in senses:
+        for rel_wnid, rel_name in s.ilrs:
+            for s2, w2 in senses:
+                if s2.wnid == rel_wnid:
+                    rels[(w, w2)] = rel_name
+
+    graph = nx.DiGraph()
+    graph.add_edges_from(rels.keys())
+    plt.figure(figsize=(15, 10))
+    pos = nx.spring_layout(graph)
+    nx.draw_networkx(graph, pos=pos, arrows=True, with_labels=True)
+    nx.draw_networkx_edge_labels(graph, pos=pos, edge_labels=rels, label_pos=0.3)
+    plt.show()

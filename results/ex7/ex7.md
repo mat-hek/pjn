@@ -21,3 +21,22 @@ ex7.wypadek_drogowy_hypernym(q)
 [x.toString() for x in ex7.wypadek_hyponyms(q, row=2)]
 ['PLWN-00235346-n  {czołówka:9, zderzenie czołowe:1}  ()', 'PLWN-00471555-n  {stłuczka:1}  ()', 'PLWN-00441365-n  {kolizja drogowa:1}  ()', 'PLWN-00037295-n  {obwał:1}  ()', 'PLWN-00410902-n  {wypadek drogowy:1}  ()']
 ```
+
+
+#7 Przedstaw w postaci grafu skierowanego (z etykietami dla krawędzi) relacje semantyczne pomiędzy następującymi grupami leksemów:
+- szkoda2, strata1, uszczerbek1, szkoda majątkowa1, uszczerbek na zdrowiu1, krzywda1, niesprawiedliwość1, nieszczęście2.
+- wypadek1, wypadek komunikacyjny1, kolizja2, zderzenie2, kolizja drogowa1, bezkolizyjny2, katastrofa budowlana1, wypadek drogowy1.
+
+```python
+words1 = "szkoda2n, strata1n, uszczerbek1n, szkoda majątkowa1n, uszczerbek na zdrowiu1n, krzywda1n, niesprawiedliwość1n, nieszczęście2n".split(", ")
+ex7.show_relations(q, words1)
+```
+![Graf relacji słów nr 1](relacje1_graph.png)
+
+
+```python
+words2 = "wypadek1n, wypadek komunikacyjny1n, kolizja2n, zderzenie2n, kolizja drogowa1n, katastrofa budowlana1n, wypadek drogowy1n".split(", ")
+ex7.show_relations(q, words2)
+```
+
+![Graf relacji słów nr 2](relacje2_graph.png)
