@@ -1,3 +1,5 @@
+Użyty został poprawiony pywnxml: https://github.com/mat-hek/pywnxml
+
 #3 Znajdź wszystkie znaczenia rzeczownika szkoda oraz wymień ich synonimy (jeśli posiadają).
 ```python
 [x.toString() for x in ex7.szkoda_meanings(q)]
@@ -48,9 +50,9 @@ nieszczęście2 - katastrofa budowlana1.
 
 ```python
 ex7.leacock_chodorow(q, "szkoda2", "wypadek1")
-1.0
+1.2430380486862944
 ex7.leacock_chodorow(q, "kolizja2", "szkoda majątkowa1")
-0.8239087409443188
+1.0669467896306133
 ex7.leacock_chodorow(q, "nieszczęście2", "katastrofa budowlana1")
-0.6478174818886375
+0.890855530574932
 ```
