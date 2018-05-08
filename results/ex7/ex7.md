@@ -40,3 +40,17 @@ ex7.show_relations(q, words2)
 ```
 
 ![Graf relacji słów nr 2](relacje2_graph.png)
+
+#8 Znajdź wartość miary pokrewieństwa semantycznego Leacocka-Chodorowa ftp://www-vhost.cs.toronto.edu/public_html/public_html/pub/gh/Budanitsky+Hirst-2001.pdf pomiędzy następującymi parami leksemów:
+szkoda2 - wypadek1,
+kolizja2 - szkoda majątkowa1,
+nieszczęście2 - katastrofa budowlana1.
+
+```python
+ex7.leacock_chodorow(q, "szkoda2", "wypadek1")
+1.0
+ex7.leacock_chodorow(q, "kolizja2", "szkoda majątkowa1")
+0.8239087409443188
+ex7.leacock_chodorow(q, "nieszczęście2", "katastrofa budowlana1")
+0.6478174818886375
+```

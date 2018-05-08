@@ -72,3 +72,8 @@ def show_relations(query: WNQuery, words):
     nx.draw_networkx(graph, pos=pos, arrows=True, with_labels=True)
     nx.draw_networkx_edge_labels(graph, pos=pos, edge_labels=rels, label_pos=0.3)
     plt.show()
+
+
+def leacock_chodorow(query: WNQuery, w1, w2):
+    [wnid1, wnid2] = [query.lookUpSense(w[:-1], int(w[-1]), 'n').wnid for w in [w1, w2]]
+    return query.simLeaCho(wnid1, wnid2, 'n', 'hypernym', True)
