@@ -25,6 +25,7 @@ defmodule Pjn.Mixfile do
       {:explot, "~> 0.1.0"},
       {:flow, "~> 0.13"},
       {:httpoison, "~> 1.1"},
+      {:quinn, "~> 1.1"},
     ]
   end
 end
