@@ -46,4 +46,54 @@ defmodule Ex8 do
     end)
   end
 
+  def reject_multi_category(ner_results) do
+    ner_results
+    |> Enum.group_by(fn {_cat, phrase} -> phrase end, fn {cat, _phrase} -> cat end)
+    |> Enum.filter(fn {_phrase, cats} -> cats |> Enum.uniq() |> length == 1 end)
+    |> Enum.flat_map(fn {phrase, cats} -> cats |> Enum.map(&{&1, phrase}) end)
+  end
+
+  def most_frequent_phrases(ner_results) do
+    ner_results
+    |> Enum.map(fn {cat, phrase} -> {cat, phrase |> Enum.join(" ")} end)
+    |> Enum.group_by(fn {_cat, phrase} -> phrase end, fn {cat, _phrase} -> cat end)
+    |> Enum.map(fn {phrase, cats} -> {phrase, length(cats), Enum.uniq(cats)} end)
+    |> Enum.sort_by(fn {_phrase, num_found, _cats} -> num_found end, &>=/2)
+  end
+
+  def most_frequent_per_category(ner_results, limit \\ :infinity) do
+    res = ner_results
+    |> Enum.group_by(fn {cat, _phrase} -> cat |> extract_main_category() end)
+    |> Map.new(fn {k, v} -> {k, v |> most_frequent_phrases()} end)
+    case limit do
+      :infinity ->
+        res
+      x when is_integer(x) ->
+        res |> Enum.map(fn {k, v} -> {k, v |> Enum.take(limit)} end)
+    end
+  end
+
+  def plot_categories_sizes(ner_results) do
+    {x, y} = ner_results
+    |> Enum.group_by(fn {cat, _phrase} -> cat end)
+    |> Enum.map(fn {cat, phrases} -> {cat, length(phrases)} end)
+    |> Enum.sort_by(fn {_cat, size} -> size end, &>=/2)
+    |> Enum.unzip()
+
+    Explot.new
+    |> Explot.x_axis_labels(x)
+    |> Explot.bar(nil, y)
+    |> Explot.show
+  end
+
+  def plot_main_categories_sizes(ner_results) do
+    ner_results
+    |> Enum.map(fn {cat, phrase} -> {cat |> extract_main_category(), phrase} end)
+    |> plot_categories_sizes()
+  end
+
+  defp extract_main_category(category) do
+    category |> String.slice(0, 7)
+  end
+
 end

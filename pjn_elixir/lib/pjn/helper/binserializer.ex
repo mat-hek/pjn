@@ -7,7 +7,7 @@ defmodule Pjn.Helper.Binserializer do
   end
   def read_from_file(path) do
     with {:ok, data} <- File.open(path, [:read], & IO.binread(&1, :all)) do
-      data |> :erlang.binary_to_term
+      {:ok, data |> :erlang.binary_to_term}
     end
   end
 end
