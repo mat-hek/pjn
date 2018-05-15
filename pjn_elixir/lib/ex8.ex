@@ -38,12 +38,10 @@ defmodule Ex8 do
       |> Enum.map(fn %{attr: attr, value: [id]} ->
         {{attr |> Keyword.fetch!(:chan), String.to_integer(id)}, orth}
       end)
+      |> Enum.filter(fn {{_cat, id}, _orth} -> id != 0 end)
     end)
     |> Enum.group_by(fn {k, _v} -> k end, fn {_k, v} -> v end)
-    |> Enum.flat_map(fn
-      {{cat, 0}, words} -> words |> Enum.map(& {cat, [&1]})
-      {{cat, _id}, words} -> [{cat, words}]
-    end)
+    |> Enum.map(fn {{cat, _id}, words} -> {cat, words} end)
   end
 
   def reject_multi_category(ner_results) do
